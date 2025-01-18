@@ -1,49 +1,52 @@
 pipeline {
     agent any
+    
+    // If you need specific tools or environment variables
+    environment {
+        GITHUB_REPO = 'https://github.com/VirangaWeerabandara/Jenkins-Test.git'
+        BRANCH_NAME = 'main'  // or your target branch
+        PYTHON_SCRIPT = 'jenkins-test.py'  // name of your Python script
+    }
+    
     stages {
-        stage('Clone Repository') {
+        stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/VirangaWeerabandara/Jenkins-Test.git'
+                // Clean workspace and checkout code from GitHub
+                cleanWs()
+                git branch: env.BRANCH_NAME,
+                    url: env.GITHUB_REPO
             }
         }
         
-        stage('Check Python Installation') {
+        stage('Verify Python') {
             steps {
-                script {
-                    def pythonInstalled = sh(script: 'which python3', returnStatus: true)
-                    
-                    // Check if Python is installed
-                    if (pythonInstalled != 0) {
-                        error 'Python is not installed on this machine.'
-                    } else {
-                        echo 'Python is installed.'
-                    }
-                }
-            }
-        }
-
-        stage('Install Dependencies') {
-            steps {
-                script {
-                    sh """
-                    python3 -m venv venv
-                    . venv/bin/activate
-                    pip install -r requirements.txt || echo "No requirements.txt found"
-                    """
-                }
+                // Verify Python installation
+                sh 'python3 --version'
             }
         }
         
         stage('Run Python Script') {
             steps {
-                script {
-                    // This will ensure that we are running the Python file from the cloned repository
-                    sh """
-                    . venv/bin/activate
-                    python jenkins_test.py
-                    """
+                // Execute the Python script
+                sh 'python3 ${PYTHON_SCRIPT}'
+            }
+            
+            // Optional: Handle script output or failure
+            post {
+                success {
+                    echo 'Python script executed successfully'
+                }
+                failure {
+                    echo 'Python script execution failed'
                 }
             }
+        }
+    }
+    
+    // Optional: Global post-build actions
+    post {
+        always {
+            cleanWs()  // Clean workspace after execution
         }
     }
 }
