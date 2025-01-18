@@ -3,7 +3,7 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git branch: 'main', url: 'https://github.com/your-username/your-repo.git'
+                git branch: 'main', url: 'https://github.com/VirangaWeerabandara/Jenkins-Test.git'
             }
         }
         stage('Install Dependencies') {
@@ -22,7 +22,7 @@ pipeline {
                 script {
                     sh """
                     source venv/bin/activate
-                    python your_script.py
+                    python jenkins_test.py
                     """
                 }
             }
