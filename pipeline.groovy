@@ -37,6 +37,7 @@ pipeline {
         stage('Run Python Script') {
             steps {
                 script {
+                    // This will ensure that we are running the Python file from the cloned repository
                     sh """
                     . venv/bin/activate
                     python jenkins_test.py
